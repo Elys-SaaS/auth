@@ -1,29 +1,19 @@
 package main
 
 import (
+	"github.com/Elys-SaaS/auth/db"
+	"github.com/Elys-SaaS/auth/handler"
 	"github.com/Elys-SaaS/auth/router"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	"github.com/Elys-SaaS/auth/services"
 )
 
-// @title Swagger Example API
-// @version 1.0
-// @description Conduit API
-// @title Conduit API
-
-// @host 127.0.0.1:8585
-// @BasePath /api
-
-// @schemes http https
-// @produce	application/json
-// @consumes application/json
-
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
 	r := router.New()
-
-	r.GET("/swagger/*", echoSwagger.WrapHandler)
-
+	d := db.New()
+	v1 := r.Group("/api")
+	// db.AutoMigrate(d)
+	us := services.NewUserService(d)
+	h := handler.NewHandler(us)
+	h.Register(v1)
 	r.Logger.Fatal(r.Start("127.0.0.1:8585"))
 }
