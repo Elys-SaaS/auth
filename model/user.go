@@ -12,8 +12,6 @@ type User struct {
 	Username string `gorm:"unique_index;not null"`
 	Email    string `gorm:"unique_index;not null"`
 	Password string `gorm:"not null"`
-	Bio      *string
-	Image    *string
 }
 
 func (u *User) HashPassword(plain string) (string, error) {

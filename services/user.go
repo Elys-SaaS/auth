@@ -1,8 +1,10 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/Elys-SaaS/auth/model"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -18,7 +20,7 @@ func NewUserService(db *gorm.DB) *UserService {
 func (us *UserService) GetByID(id int) (*model.User, error) {
 	var m model.User
 	if err := us.db.First(&m, id).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -29,7 +31,7 @@ func (us *UserService) GetByID(id int) (*model.User, error) {
 func (us *UserService) GetByEmail(e string) (*model.User, error) {
 	var m model.User
 	if err := us.db.Where(&model.User{Email: e}).First(&m).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -40,7 +42,7 @@ func (us *UserService) GetByEmail(e string) (*model.User, error) {
 func (us *UserService) GetByUsername(username string) (*model.User, error) {
 	var m model.User
 	if err := us.db.Where(&model.User{Username: username}).Preload("Followers").First(&m).Error; err != nil {
-		if gorm.IsRecordNotFoundError(err) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -53,5 +55,5 @@ func (us *UserService) Create(u *model.User) (err error) {
 }
 
 func (us *UserService) Update(u *model.User) error {
-	return us.db.Model(u).Update(u).Error
+	return us.db.Model(u).Updates(u).Error
 }

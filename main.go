@@ -10,8 +10,9 @@ import (
 func main() {
 	r := router.New()
 	d := db.New()
+
 	v1 := r.Group("/api")
-	// db.AutoMigrate(d)
+	db.AutoMigrate(d)
 	us := services.NewUserService(d)
 	h := handler.NewHandler(us)
 	h.Register(v1)

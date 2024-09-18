@@ -37,3 +37,32 @@ func (h *Handler) SignIn(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, newUserResponse(u))
 }
+
+func (h *Handler) Refresh(c echo.Context) error {
+	req := &refreshTokenRequest{}
+	if err := req.bind(c); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, utils.NewError(err))
+	}
+	claims, err := utils.VerifyJWT(req.RefreshToken, utils.RefreshToken)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+
+	id, ok := (*claims)["id"].(int)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, utils.AccessForbidden())
+	}
+
+	u, err := h.userService.GetByID(id)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, utils.NewError(err))
+	}
+	if u == nil {
+		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
+	}
+
+	accessToken := utils.GenerateJWT(u.ID, utils.AccessToken)
+	refreshToken := utils.GenerateJWT(u.ID, utils.RefreshToken)
+
+	return c.JSON(http.StatusOK, newUserResponse(u))
+}

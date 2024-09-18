@@ -3,37 +3,41 @@ package db
 import (
 	"fmt"
 
-	"os"
-
 	"github.com/Elys-SaaS/auth/model"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+var (
+	dsn = "host=localhost user=postgres password=mysecretpassword dbname=test-pg port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 )
 
 func New() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./auth.db")
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println("storage err: ", err)
 	}
-	db.DB().SetMaxIdleConns(3)
-	db.LogMode(true)
+
 	return db
 }
 
 func TestDB() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./../auth.db")
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		fmt.Println("storage err: ", err)
 	}
-	db.DB().SetMaxIdleConns(3)
-	db.LogMode(false)
 	return db
 }
 
 func DropTestDB() error {
-	if err := os.Remove("./../auth.db"); err != nil {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		fmt.Println("storage err: ", err)
+	}
+	if err := db.Exec("DROP DATABASE gorm_test").Error; err != nil {
 		return err
 	}
+
 	return nil
 }
 
