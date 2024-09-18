@@ -11,7 +11,7 @@ import (
 )
 
 func New() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./realworld.db")
+	db, err := gorm.Open("sqlite3", "./auth.db")
 	if err != nil {
 		fmt.Println("storage err: ", err)
 	}
@@ -21,7 +21,7 @@ func New() *gorm.DB {
 }
 
 func TestDB() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./../realworld_test.db")
+	db, err := gorm.Open("sqlite3", "./../auth.db")
 	if err != nil {
 		fmt.Println("storage err: ", err)
 	}
@@ -31,7 +31,7 @@ func TestDB() *gorm.DB {
 }
 
 func DropTestDB() error {
-	if err := os.Remove("./../realworld_test.db"); err != nil {
+	if err := os.Remove("./../auth.db"); err != nil {
 		return err
 	}
 	return nil
