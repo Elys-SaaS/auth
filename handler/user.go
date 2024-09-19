@@ -61,8 +61,5 @@ func (h *Handler) Refresh(c echo.Context) error {
 		return c.JSON(http.StatusForbidden, utils.AccessForbidden())
 	}
 
-	accessToken := utils.GenerateJWT(u.ID, utils.AccessToken)
-	refreshToken := utils.GenerateJWT(u.ID, utils.RefreshToken)
-
 	return c.JSON(http.StatusOK, newUserResponse(u))
 }
